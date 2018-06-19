@@ -19,9 +19,9 @@ FLAGS, unparsed = parse_args()
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', level=logging.DEBUG)
 
-print("init")
-vocabulary = read_data(FLAGS.text)
-print('Data size', len(vocabulary))
+
+#vocabulary = read_data(FLAGS.text)
+
 
 print(FLAGS.dictionary)
 with open(FLAGS.dictionary, encoding='utf-8') as inf:
@@ -57,7 +57,9 @@ with tf.Session() as sess:
         logging.debug('epoch [{0}]....'.format(x))
         state = sess.run(model.state_tensor)
         for X,Y in utils.get_train_data(reverse_dictionary, batch_size=FLAGS.batch_size, num_steps=FLAGS.num_steps):
-
+            print("000000000000000")
+            print(X)
+            print(Y)
             ##################
             # Your Code here
             feed_dict = {model.X: X,
@@ -65,12 +67,12 @@ with tf.Session() as sess:
                          model.state_tensor: state,
                          model.keep_prob: 1.0}
             ##################
-            #model.outputs_state_tensor
             gs, _, state, l, summary_string = sess.run(
-                [model.global_step, model.optimizer, model.state_tensor, model.loss, model.merged_summary_op], feed_dict=feed_dict)
+                [model.global_step, model.optimizer, model.outputs_state_tensor, model.loss, model.merged_summary_op], feed_dict=feed_dict)
             summary_string_writer.add_summary(summary_string, gs)
+            print(gs)
 
-            if gs % 10 == 0:
+            if gs % 1 == 0:
                 logging.debug('step [{0}] loss [{1}]'.format(gs, l))
                 save_path = saver.save(sess, os.path.join(
                     FLAGS.output_dir, "model.ckpt"), global_step=gs)

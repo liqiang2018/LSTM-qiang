@@ -38,9 +38,9 @@ def index_data(sentences, dictionary):
 def get_train_data(vocabulary, batch_size, num_steps):
     ##################
     # Your Code here
-    #raw_data = np.array(vocabulary, dtype=np.int32)  # raw data : train_data | vali_data | test data
     raw_data = list(vocabulary.keys())
-
+    raw_data = np.array(raw_data, dtype=np.int32)  # raw
+    raw_data = list(vocabulary.keys())
     data_len = len(raw_data)  # how many words in the data_set
     batch_len = data_len // batch_size
     data = np.zeros([batch_size, batch_len], dtype=np.int32)  # batch_len 就是几个word的意思

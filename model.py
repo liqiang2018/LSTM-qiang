@@ -32,7 +32,7 @@ class Model():
         self.rnn_layers = rnn_layers
         self.learning_rate = learning_rate
         self.state_tensor = None
-
+        self.outputs_state_tensor = None
     def build(self, embedding_file=None):
         # global step
         self.global_step = tf.Variable(
@@ -45,32 +45,33 @@ class Model():
 
         self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
+        lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(self.dim_embedding)
+        lstm_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell, self.keep_prob)
+        cell = tf.nn.rnn_cell.MultiRNNCell([lstm_cell] * self.rnn_layers)
+        # 初始化最初状态
+        self.state_tensor = cell.zero_state(self.batch_size, tf.float32)
+
         with tf.variable_scope('embedding'):
             if embedding_file:
                 # if embedding file provided, use it.
+                print("if embedding file provided, use it")
                 embedding = np.load(embedding_file)
                 embed = tf.constant(embedding, name='embedding')
             else:
                 # if not, initialize an embedding and train it.
+                print("if not, initialize an embedding and train it.")
                 embed = tf.get_variable(
                     'embedding', [self.num_words, self.dim_embedding])
                 tf.summary.histogram('embed', embed)
 
             data = tf.nn.embedding_lookup(embed, self.X)
         seq_output =[]
+        state = self.state_tensor
         with tf.variable_scope('rnn'):
 
             ##################
             # Your Code here
-            lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(self.dim_embedding )
-            lstm_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell,self.keep_prob)
-            cell = tf.nn.rnn_cell.MultiRNNCell([lstm_cell] *self.rnn_layers)
-
-            #初始化最初状态
-            self.state_tensor = cell.zero_state(self.batch_size,tf.float32)
-            state = self.state_tensor
-            inputs = tf.nn.embedding_lookup(embed,self.X)
-            inputs = tf.nn.dropout(inputs,self.keep_prob)
+            inputs = tf.nn.dropout(data,self.keep_prob)
             for time_step in range(self.num_steps):
                 if time_step >0:tf.get_variable_scope().reuse_variables()
                 cell_output,state = cell(inputs[:,time_step,:],state)
@@ -87,7 +88,7 @@ class Model():
             bias =  tf.get_variable("bias",[self.num_words])
             logits = tf.matmul(seq_output_final,weight) + bias
             ##################
-
+        self.outputs_state_tensor = state
         tf.summary.histogram('logits', logits)
 
         self.predictions = tf.nn.softmax(logits, name='predictions')
