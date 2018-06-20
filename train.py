@@ -59,7 +59,6 @@ with tf.Session() as sess:
         state = sess.run(model.state_tensor)
         for (X,Y) in utils.get_train_data(vocabulary,dictionary, batch_size=FLAGS.batch_size, num_steps=FLAGS.num_steps):
             ##################
-            # Your Code here
             feed_dict = {model.X: X,
                          model.Y:Y,
                          model.state_tensor: state,

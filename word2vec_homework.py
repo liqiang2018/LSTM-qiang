@@ -76,13 +76,6 @@ def build_dataset(words, n_words):
   print(data[:10])
   print(count[:10])
 
-  f1 = open('dictionary.json', 'w')
-  f1.write(json.dumps(dictionary))
-  f2 = open('reverse_dictionary.json', 'w')
-  f2.write(json.dumps(reversed_dictionary))
-  f1.close()
-  f2.close()
-
   return data, count, dictionary, reversed_dictionary
 
 # Filling 4 global variables:
@@ -92,6 +85,13 @@ def build_dataset(words, n_words):
 # dictionary - map of words(strings) to their codes(integers)
 # reverse_dictionary - maps codes(integers) to words(strings)
 data, count, dictionary, reverse_dictionary = build_dataset(vocabulary,vocabulary_size)
+# 保存dictionary dictionary
+f1 = open('dictionary.json', 'w')
+f1.write(json.dumps(dictionary))
+f2 = open('reverse_dictionary.json', 'w')
+f2.write(json.dumps(reverse_dictionary))
+f1.close()
+f2.close()
 
 print(len(dictionary))
 print(len(reverse_dictionary))

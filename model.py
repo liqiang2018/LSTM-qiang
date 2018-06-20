@@ -66,7 +66,8 @@ class Model():
             ##################
             # add by qiang.li
             lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(self.dim_embedding)
-            lstm_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell, self.keep_prob)
+            if is_training:
+                lstm_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell, output_keep_prob=self.keep_prob)
             cell = tf.nn.rnn_cell.MultiRNNCell([lstm_cell] * self.rnn_layers)
             # 初始化最初状态
             self.state_tensor = cell.zero_state(self.batch_size, tf.float32)
@@ -79,7 +80,6 @@ class Model():
 
         with tf.variable_scope('softmax'):
             ##################
-            # Your Code here
             weight = tf.get_variable("weight",[self.dim_embedding,self.num_words],initializer=tf.random_normal_initializer(stddev=0.01))
             bias =  tf.get_variable("bias",[self.num_words],initializer=tf.random_normal_initializer(stddev=0.01))
             logits = tf.matmul(seq_output_final,weight) + bias
