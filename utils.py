@@ -35,26 +35,30 @@ def index_data(sentences, dictionary):
     return index.reshape(shape)
 
 
-def get_train_data(vocabulary, batch_size, num_steps):
+def get_train_data(vocabulary, dictionary,batch_size, num_steps):
     ##################
     # Your Code here
-    raw_data = list(vocabulary.keys())
-    raw_data = np.array(raw_data, dtype=np.int32)  # raw
-    data_len = len(raw_data)  # how many words in the data_set
+    data_len = len(vocabulary)
     batch_len = data_len // batch_size
-    data = np.zeros([batch_size, batch_len], dtype=np.int32)  # batch_len 就是几个word的意思
+
+    raw_x = [dictionary.get(w, 0) for w in vocabulary]
+    raw_y = [dictionary.get(w, 0) for w in vocabulary[1:]]
+    raw_y.append(5000 - 1)
+
+    batch_len = data_len // batch_size
+    data_x = np.zeros([batch_size, batch_len], dtype=np.int32)
+    data_y = np.zeros([batch_size, batch_len], dtype=np.int32)
 
     for i in range(batch_size):
-        data[i] = raw_data[batch_len * i:batch_len * (i + 1)]
+        data_x[i] = raw_x[batch_len * i: batch_len * (i + 1)]
+        data_y[i] = raw_y[batch_len * i: batch_len * (i + 1)]
 
-    epoch_size = (batch_len - 1) // num_steps
-
-    if epoch_size == 0:
-        raise ValueError("epoch_size == 0, decrease batch_size or num_steps")
+    epoch_size = batch_len // num_steps
+    print("epoch_size,",epoch_size)
 
     for i in range(epoch_size):
-        x = data[:, i * num_steps:(i + 1) * num_steps]
-        y = data[:, i * num_steps + 1:(i + 1) * num_steps + 1]
+        x = data_x[:, num_steps * i: num_steps * (i + 1)]
+        y = data_y[:, num_steps * i: num_steps * (i + 1)]
         yield (x, y)
     ##################
 

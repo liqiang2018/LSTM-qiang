@@ -61,7 +61,6 @@ def build_dataset(words, n_words):
   count.extend(collections.Counter(words).most_common(n_words - 1))
   print("count:",len(count))
   dictionary = dict()
-  count = count[:5000]#全宋词全文共6010个不同的单字符，这里只取出现次数最多的前5000个单字符。
   for word, _ in count:
     dictionary[word] = len(dictionary)
 
@@ -96,7 +95,7 @@ data, count, dictionary, reverse_dictionary = build_dataset(vocabulary,vocabular
 
 print(len(dictionary))
 print(len(reverse_dictionary))
-a=1/0
+
 del vocabulary  # Hint to reduce memory.
 print('Most common words (+UNK)', count[:5])
 print('Sample data', data[:10], [reverse_dictionary[i] for i in data[:10]])
@@ -281,7 +280,7 @@ try:
   plot_only = 500
   low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
   labels = [reverse_dictionary[i] for i in range(plot_only)]
-  plot_with_labels(low_dim_embs, labels, os.path.join(gettempdir(), 'qsc3.png'))
+  plot_with_labels(low_dim_embs, labels, os.path.join(gettempdir(), 'qsc.png'))
 
 except ImportError as ex:
   print('Please install sklearn, matplotlib, and scipy to show embeddings.')

@@ -20,7 +20,8 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', level=logging.DEBUG)
 
 
-#vocabulary = read_data(FLAGS.text)
+vocabulary = read_data(FLAGS.text)
+print("vocabulary len:",len(vocabulary))
 
 
 print(FLAGS.dictionary)
@@ -56,7 +57,7 @@ with tf.Session() as sess:
     for x in range(1):
         logging.debug('epoch [{0}]....'.format(x))
         state = sess.run(model.state_tensor)
-        for (X,Y) in utils.get_train_data(reverse_dictionary, batch_size=FLAGS.batch_size, num_steps=FLAGS.num_steps):
+        for (X,Y) in utils.get_train_data(vocabulary,dictionary, batch_size=FLAGS.batch_size, num_steps=FLAGS.num_steps):
             ##################
             # Your Code here
             feed_dict = {model.X: X,
