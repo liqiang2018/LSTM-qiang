@@ -33,7 +33,7 @@ class Model():
         self.learning_rate = learning_rate
         self.state_tensor = None
         self.outputs_state_tensor = None
-    def build(self, embedding_file=None):
+    def build(self, embedding_file=None,is_training = True):
         # global step
         self.global_step = tf.Variable(
             0, trainable=False, name='self.global_step', dtype=tf.int64)
@@ -99,7 +99,7 @@ class Model():
         # 把标准差作为loss添加到最终的loss里面，避免网络每次输出的语句都是机械的重复
         self.loss = self.loss + var_loss
         tf.summary.scalar('total_loss', self.loss)
-
+        if not is_training:return
         # gradient clip
         tvars = tf.trainable_variables()
         grads, _ = tf.clip_by_global_norm(tf.gradients(loss, tvars), 5)
