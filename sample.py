@@ -47,7 +47,7 @@ with tf.Session() as sess:
 
     except Exception:
         logging.debug('no check point found....')
-        #exit(0)
+        exit(0)
 
     for title in titles:
         state = sess.run(model.state_tensor)

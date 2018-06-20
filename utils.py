@@ -56,7 +56,7 @@ def get_train_data(vocabulary, batch_size, num_steps):
     for i in range(epoch_size):
         x = data[:, i * num_steps:(i + 1) * num_steps]
         y = data[:, i * num_steps + 1:(i + 1) * num_steps + 1]
-    yield (x, y)
+        yield (x, y)
     ##################
 
 

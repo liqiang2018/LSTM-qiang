@@ -45,11 +45,6 @@ class Model():
 
         self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
-        lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(self.dim_embedding)
-        lstm_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell, self.keep_prob)
-        cell = tf.nn.rnn_cell.MultiRNNCell([lstm_cell] * self.rnn_layers)
-        # 初始化最初状态
-        self.state_tensor = cell.zero_state(self.batch_size, tf.float32)
 
         with tf.variable_scope('embedding'):
             if embedding_file:
@@ -66,16 +61,17 @@ class Model():
 
             data = tf.nn.embedding_lookup(embed, self.X)
         seq_output =[]
-        state = self.state_tensor
         with tf.variable_scope('rnn'):
 
             ##################
-            # Your Code here
-            inputs = tf.nn.dropout(data,self.keep_prob)
-            for time_step in range(self.num_steps):
-                if time_step >0:tf.get_variable_scope().reuse_variables()
-                cell_output,state = cell(inputs[:,time_step,:],state)
-                seq_output.append(cell_output)
+            # add by qiang.li
+            lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(self.dim_embedding)
+            lstm_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell, self.keep_prob)
+            cell = tf.nn.rnn_cell.MultiRNNCell([lstm_cell] * self.rnn_layers)
+            # 初始化最初状态
+            self.state_tensor = cell.zero_state(self.batch_size, tf.float32)
+
+            seq_output, self.outputs_state_tensor = tf.nn.dynamic_rnn(cell,data,initial_state=self.state_tensor)
             ##################
 
         # flatten it
@@ -84,11 +80,11 @@ class Model():
         with tf.variable_scope('softmax'):
             ##################
             # Your Code here
-            weight = tf.get_variable("weight",[self.dim_embedding,self.num_words])
-            bias =  tf.get_variable("bias",[self.num_words])
+            weight = tf.get_variable("weight",[self.dim_embedding,self.num_words],initializer=tf.random_normal_initializer(stddev=0.01))
+            bias =  tf.get_variable("bias",[self.num_words],initializer=tf.random_normal_initializer(stddev=0.01))
             logits = tf.matmul(seq_output_final,weight) + bias
             ##################
-        self.outputs_state_tensor = state
+
         tf.summary.histogram('logits', logits)
 
         self.predictions = tf.nn.softmax(logits, name='predictions')

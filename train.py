@@ -53,13 +53,10 @@ with tf.Session() as sess:
     except Exception:
         logging.debug('no check point found....')
 
-    for x in range(2):
+    for x in range(1):
         logging.debug('epoch [{0}]....'.format(x))
         state = sess.run(model.state_tensor)
-        for X,Y in utils.get_train_data(reverse_dictionary, batch_size=FLAGS.batch_size, num_steps=FLAGS.num_steps):
-            print("000000000000000")
-            print(X)
-            print(Y)
+        for (X,Y) in utils.get_train_data(reverse_dictionary, batch_size=FLAGS.batch_size, num_steps=FLAGS.num_steps):
             ##################
             # Your Code here
             feed_dict = {model.X: X,
@@ -70,9 +67,8 @@ with tf.Session() as sess:
             gs, _, state, l, summary_string = sess.run(
                 [model.global_step, model.optimizer, model.outputs_state_tensor, model.loss, model.merged_summary_op], feed_dict=feed_dict)
             summary_string_writer.add_summary(summary_string, gs)
-            print(gs)
 
-            if gs % 1 == 0:
+            if gs % 10== 0:
                 logging.debug('step [{0}] loss [{1}]'.format(gs, l))
                 save_path = saver.save(sess, os.path.join(
                     FLAGS.output_dir, "model.ckpt"), global_step=gs)
